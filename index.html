@@ -70,10 +70,21 @@
                 </button>
             </div>
             <div class="modal-body">
-                ...
+                <div class="mb-3">
+                    <label for="inputDate" class="form-label">日期</label>
+                    <input type="date" name="date" class="form-control" id="inputDate">
+                </div>
+                <div class="mb-3">
+                    <label for="inputMoney" class="form-label">金額</label>
+                    <input type="number" name="money" class="form-control" id="inputMoney">
+                </div>
+                <div class="mb-3">
+                    <label for="inputMemo" class="form-label">備註</label>
+                    <input type="text" name="memo" class="form-control" id="inputMemo">
+                </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-primary">添加</button>
+                <button type="button" class="btn btn-primary" id="saveBtn">添加</button>
             </div>
             </div>
         </div>
