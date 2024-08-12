@@ -45,6 +45,7 @@ window.addEventListener('load', () => {
 
             }
             let ulMonth = document.getElementById('selectMonth');
+            ulMonth.innerHTML += "<li><a class='dropdown-item' href='#' data-key=0>ALL</a></li>"
             for (let i = 1; i <= 12; i++) {
                 ulMonth.innerHTML += "<li><a class='dropdown-item' href='#' data-key="+i+">"+i+" 月</a></li>"
                 
@@ -85,6 +86,62 @@ window.addEventListener('load', () => {
         r = store.add(value);	     //新增資料  
 
     })
+
+    //月份搜尋
+    document.getElementById("selectMonth").addEventListener('click', (e) => {
+        e.preventDefault();
+        let target = e.target;
+		let month = target.dataset.key;	
+        console.log(month)
+        if (month == 0){
+            getAllList('', '');
+        } else{
+		    getCursorValue( month.padStart(2, '0') );
+        }
+    })
+
+    	 //取出每一筆資料進行比對-openCursor()
+	 function getCursorValue(findvalue) {
+        let tx = DB_tx(storeName, 'readonly');
+        let store = tx.objectStore(storeName);
+        
+        const index = store.index("date");    //依date欄位搜尋	
+        let request = index.openCursor();
+        let cursorJson = [];
+        request.onsuccess = (e) => {					
+            let cursor = e.target.result;					
+            if (cursor) {
+                console.log(cursor.value)
+                //比對cursor.value.date是否含有「-月份-」的資料,例如「-07-」
+                if (cursor.value.date.indexOf("-"+findvalue+"-") !== -1) {                
+                    cursorJson.push(cursor.value);
+                }
+                cursor.continue();          
+            }
+            //資料列表
+            showDataList(cursorJson);
+        };
+    }
+
+    document.getElementById('cards').addEventListener('click', (e) => {
+		e.preventDefault();
+		let target = e.target;	//點擊的目標物件				
+		let keyNo = parseInt(target.dataset.key);
+		//當目標物件是按鈕時才做處理
+		if( target.tagName.toLowerCase() === 'a' ){
+			if (confirm("確定要執行刪除?")){				
+				let tx = DB_tx(storeName, 'readwrite');
+				let store = tx.objectStore(storeName);
+				let oneRecords = store.delete(keyNo);
+				oneRecords.onsuccess = (e) => {	
+					getAllList("", "");
+				}
+				oneRecords.onerror = (e) => {
+					showMessage("刪除失敗!<br>" + e.target.error.message);
+				}
+			}
+		}
+	})
 
     function getAllList(find, findvalue) {		
     
